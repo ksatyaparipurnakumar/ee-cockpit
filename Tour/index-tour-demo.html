@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>EE Cockpit Tour — Demo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Tour overlay styles -->
+<link rel="stylesheet" href="tour.css" />
+<style>
+  /* Demo-only styling — replace with your app's own */
+  :root {
+    --bg: #070b14; --bg2: #10162e; --line: rgba(122,143,255,0.18);
+    --txt: #e6e9f5; --txt-2: #cdd3eb; --txt-3: #9aa3c7;
+    --c1: #06b6d4; --c2: #8b5cf6; --c3: #ec4899;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--txt); font-family: Inter, system-ui, Arial, sans-serif; min-height: 100vh; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(800px 600px at 8% 6%, rgba(124,58,237,.16), transparent 55%),
+                radial-gradient(900px 700px at 92% 18%, rgba(6,182,212,.14), transparent 60%); }
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 18px;
+    padding: 14px 22px;
+    background: rgba(7,11,28,0.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { font-weight: 800; font-size: 18px; background: linear-gradient(90deg,var(--c1),var(--c2),var(--c3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .topnav { display: flex; gap: 4px; margin-left: 24px; }
+  .topnav a { color: var(--txt-2); text-decoration: none; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: background 0.18s ease, color 0.18s ease; }
+  .topnav a:hover { background: rgba(124,58,237,0.18); color: #fff; }
+
+  main { position: relative; z-index: 1; display: grid; grid-template-columns: 240px 1fr; gap: 0; min-height: calc(100vh - 60px); }
+  aside.sidebar { background: rgba(16,22,46,0.55); border-right: 1px solid var(--line); padding: 16px 12px; }
+  .sidebar-section { font-size: 10px; color: var(--txt-3); letter-spacing: 0.24em; text-transform: uppercase; margin: 16px 8px 6px; font-weight: 700; }
+  .sidebar a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    color: var(--txt-2); text-decoration: none;
+    font-size: 13px; font-weight: 600;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .sidebar a .ic { font-size: 16px; }
+  .sidebar a:hover, .sidebar a.active { background: rgba(124,58,237,0.18); color: #fff; }
+  .content { padding: 26px 32px; max-width: 1100px; }
+  h1.page-title { font-size: 28px; font-weight: 900; margin: 0 0 6px; letter-spacing: -0.01em; background: linear-gradient(90deg,var(--c1),var(--c2),var(--c3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p.page-sub { color: var(--txt-3); margin: 0 0 22px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .card { background: linear-gradient(160deg, rgba(16,22,46,0.85), rgba(10,15,36,0.85)); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card h3 { margin: 0 0 6px; font-size: 14px; font-weight: 700; }
+  .card p { margin: 0; font-size: 12px; color: var(--txt-3); line-height: 1.5; }
+
+  /* Reset-tour button (demo convenience) */
+  .reset-btn { margin-left: auto; background: rgba(255,255,255,0.04); border: 1px solid var(--line); color: var(--txt-2); padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+  .reset-btn:hover { background: rgba(236,72,153,0.18); border-color: var(--c3); color: #fff; }
+
+  @media (max-width: 760px) {
+    main { grid-template-columns: 1fr; }
+    aside.sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">EE Cockpit</div>
+  <nav class="topnav" aria-label="Primary">
+    <!-- Each menu item below is tagged with data-tour, title and description.
+         The tour will auto-discover them in order.                              -->
+    <a href="#dashboard"
+       data-tour="dashboard"
+       data-tour-title="Dashboard"
+       data-tour-desc="The dashboard shows your division's live status — billing efficiency, collection, AT&C loss, SAIDI, and safety days at a glance."
+       data-tour-order="1">Dashboard</a>
+    <a href="#revenue"
+       data-tour="revenue"
+       data-tour-title="Revenue & Commercial"
+       data-tour-desc="Revenue is where the DISCOM survives or dies. Billing efficiency, DCB reconciliation, HT consumer reviews, and theft handling all live here."
+       data-tour-order="2">Revenue</a>
+    <a href="#operations"
+       data-tour="operations"
+       data-tour-title="O&M War Room"
+       data-tour-desc="The O&M War Room handles outages, restoration, distribution transformer lifecycle, and reliability indices like SAIDI and SAIFI."
+       data-tour-order="3">Operations</a>
+  </nav>
+  <button class="reset-btn" onclick="EECockpitTour.resetCompletion(); location.reload();" title="Clear localStorage flag and reload to see first-visit autoplay">Reset Tour</button>
+</header>
+
+<main>
+  <aside class="sidebar" aria-label="Sidebar">
+    <div class="sidebar-section">Manage</div>
+    <a href="#hr"
+       class="menu-item"
+       data-tour="hr"
+       data-tour-title="HR & Establishment"
+       data-tour-desc="Promotions, ACRs, the Departmental Promotion Committee, disciplinary proceedings, and the reservation roster."
+       data-tour-order="4"><span class="ic">👥</span> HR & Establishment</a>
+    <a href="#finance"
+       class="menu-item"
+       data-tour="finance"
+       data-tour-title="Finance & Accounts"
+       data-tour-desc="Capex versus opex, SAP financial flow, budget discipline, and capitalisation of completed works."
+       data-tour-order="5"><span class="ic">📊</span> Finance & Accounts</a>
+    <a href="#safety"
+       class="menu-item"
+       data-tour="safety"
+       data-tour-title="Safety & Tech Sanctions"
+       data-tour-desc="Permit-to-work discipline, accident protocols, and technical sanction approvals. Safety is non-negotiable."
+       data-tour-order="6"><span class="ic">⚠</span> Safety & Tech</a>
+
+    <div class="sidebar-section">Learn</div>
+    <a href="#mentor"
+       class="menu-item"
+       data-tour="mentor"
+       data-tour-title="Smart Mentor"
+       data-tour-desc="Field-tested wisdom from senior officers — browse questions or search by topic for concise, actionable answers."
+       data-tour-order="7"><span class="ic">💡</span> Smart Mentor</a>
+    <a href="#faq"
+       class="menu-item"
+       data-tour="faq"
+       data-tour-title="FAQ Library"
+       data-tour-desc="The most common questions across revenue, O&M, HR, finance, and admin — quick answers, deeper concepts."
+       data-tour-order="8"><span class="ic">❓</span> FAQ Library</a>
+    <a href="#sim"
+       class="menu-item"
+       data-tour="sim"
+       data-tour-title="Decision Simulator"
+       data-tour-desc="Rehearse high-pressure calls — fatal accidents, political pressure, audit objections — before they arrive."
+       data-tour-order="9"><span class="ic">🎯</span> Decision Simulator</a>
+  </aside>
+
+  <section class="content">
+    <h1 class="page-title">Welcome to your Cockpit</h1>
+    <p class="page-sub">This is a sample layout demonstrating the guided tour. Wait a moment for Einstein to greet you, or click the floating "?" button.</p>
+    <div class="grid">
+      <div class="card"><h3>Billing efficiency</h3><p>98.4% (target ≥ 98%) — green</p></div>
+      <div class="card"><h3>Collection</h3><p>94.1% (target ≥ 97%) — amber</p></div>
+      <div class="card"><h3>AT&C Loss</h3><p>12.7% (target ≤ 9%) — red, requires attention</p></div>
+      <div class="card"><h3>SAIDI</h3><p>142 minutes (target ≤ 120) — amber</p></div>
+      <div class="card"><h3>DTR Failure</h3><p>4.8% (annual cap 5%) — amber</p></div>
+      <div class="card"><h3>Safety days</h3><p>214 days without LTI — green</p></div>
+    </div>
+  </section>
+</main>
+
+<!-- Order matters: faq.js -> einstein-avatar.js -> tour.js -->
+<script src="faq.js"></script>
+<script src="einstein-avatar.js"></script>
+<script src="tour.js"></script>
+<script>
+  // Initialise the tour. First visit auto-plays; later visits launch via the
+  // floating "?" button.
+  window.addEventListener('DOMContentLoaded', function () {
+    EECockpitTour.init({ autoStart: true });
+  });
+</script>
+</body>
+</html>
